@@ -1,14 +1,25 @@
-# install dependencies
+# Install dependencies
 
 $ yarn install
-
-# start service
-
-$ yarn start
 
 # Create database table
 
 Create table `assessment` with `name` and `monthly_salary` columns
+
+# Insert Data
+
+```bash
+INSERT INTO `staffs` (`name`, `monthly_salary`) VALUES
+('johnny', '10000.00'),
+('teh', '7654.00'),
+('abdul razak', '30000.00'),
+('johnny may', '100.00');
+
+```
+
+# Start service
+
+$ yarn start
 
 # Get Data
 
