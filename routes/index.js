@@ -1,4 +1,5 @@
-const db = require("../database");
+const pool = require("../databasepg");
+const format = require('pg-format');
 const express = require("express");
 const router = express.Router();
 
@@ -6,28 +7,32 @@ const router = express.Router();
 router
   .route("/")
   .get(function (req, res, next) {
-    db.query("SELECT * FROM staffs", (err, result) => {
-      if (result.length === 0) {
+    pool.query('SELECT * FROM staffs', (err, result) => {
+      console.log(result);
+      if (result.rowCount === 0) {
         // res.status(400).json({ message: "No Data Found" });
-        var sql = "INSERT INTO staffs (name, monthly_salary) VALUES ?";
         var values = [
-          ['John', '10000'],
-          ['Peter', '5000']
+          ['John', 10000],
+          ['Peter', 5000]
         ];
+        var sql = format("INSERT INTO staffs (name, monthly_salary) VALUES %L returning id" , values);
+       
 
-        db.query(sql,[values], (err, result) => {
+        pool.query(sql,(err, result) => {
             if (err) {
+              console.log(err);
               res.status(400).json({ message: err });
+            }else{
+              res.status(200).json({ message: "No Data, Inserted fake data" });
             }
-
-            res.status(200).json({ message: "No Data, Inserted fake data" });
           }
         );
       }
       else {
+        console.log(result);
         const array = [];
         let totalTax = (rate = first = firstTax = 0);
-        result.map((r) => {
+        result.rows.map((r) => {
           let salary = r.monthly_salary * 12;
           salary = parseInt(salary)
           if (salary <= 5000) {
@@ -75,14 +80,14 @@ router
           });
         });
 
-        res.status(200).json({ array });
+        res.status(200).json(array);
       }
     });
   })
   .put(function (req, res, next) {
     console.log(req.body);
 
-    db.query(
+    pool.query(
       "UPDATE staffs SET monthly_salary = ? WHERE name = ?",
       [req.body.monthly_salary, req.body.name],
       (err, result) => {
